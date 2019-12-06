@@ -95,9 +95,9 @@ def get_user_markdown(user_list, name):
     if user['name'] == name:
       process_user(user)
       scores = user['completion_day_level']
-      print(f"{user['name']} - Median solve time: {print_ts(user['median_score'])}")
+      print(f"{user['name']} - Median solve time: {print_ts(user['median_score'])}\n")
       print("| Day | Star 1 | Star 2 |")
-      print("| - | - | - |")
+      print("| --- | --- | --- |")
       days = sorted([int(s) for s in scores.keys()])
       for day in days:
         score = scores[str(day)]

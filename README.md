@@ -1,7 +1,8 @@
 # [Advent of Code 2019](https://adventofcode.com/2019)
 Christopher Tibbetts - Median solve time: 1:02:52
+
 | Day | Star 1 | Star 2 |
-| - | - | - |
+| --- | --- | --- |
 | 1 | 10:26:14 | 10:35:02 |
 | 2 | 0:14:38 | 0:22:06 |
 | 3 | 0:52:41 | 1:09:40 |

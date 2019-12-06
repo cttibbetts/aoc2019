@@ -1,5 +1,7 @@
+import sys
 import json
 import math
+from argparse import ArgumentParser
 from datetime import timedelta, datetime
 from tabulate import tabulate
 
@@ -88,20 +90,49 @@ def process_user(user):
     print([print_ts(s) for s in user['scores']])
   return user
 
+def get_user_markdown(user_list, name):
+  for user in user_list.values():
+    if user['name'] == name:
+      process_user(user)
+      scores = user['completion_day_level']
+      print(f"{user['name']} - Median solve time: {print_ts(user['median_score'])}")
+      print("| Day | Star 1 | Star 2 |")
+      print("| - | - | - |")
+      days = sorted([int(s) for s in scores.keys()])
+      for day in days:
+        score = scores[str(day)]
+        star1 = to_relative_seconds(day, int(score['1']['get_star_ts']))
+        star2 = to_relative_seconds(day, int(score['2']['get_star_ts']))
+        print(f"| {day} | {print_ts(star1)} | {print_ts(star2)} |")
+      break
+
+
 if __name__ == '__main__':
+  parser = ArgumentParser()
+  parser.add_argument('--team', type=str)
+  parser.add_argument('--user', type=str)
+  args = parser.parse_args()
+
   with open('leaderboard.json') as input:
     scoreboard = json.loads(input.readline())
-    users = scoreboard['members']
+  users = scoreboard['members']
 
-    users = sorted(
-      [process_user(u) for u in users.values()],
-      key=sort_users,
-      reverse=True
-    )
+  if args.user != 'None':
+    user = 'Christopher Tibbetts' if args.user == 'me' else args.user
+    get_user_markdown(users, user)
+    exit()
+  if args.team != 'None':
+    whitelist = teams.get(args.team)
 
-    table = [
-      ([i+1, user['name'], user['stars'] * '*', print_ts(user['median_score']), *[print_ts(ts) for ts in get_middle_scores(user)]])
-      for i, user in enumerate(users)
-      if user['stars'] > 0 and (user['name'] in whitelist if whitelist is not None else True)
-    ]
-    print(tabulate(table, headers=["Place", "Name", "Stars", "Median Solve Time", "better", "current", "worse"]))
+  users = sorted(
+    [process_user(u) for u in users.values()],
+    key=sort_users,
+    reverse=True
+  )
+
+  table = [
+    ([i+1, user['name'], user['stars'] * '*', print_ts(user['median_score']), *[print_ts(ts) for ts in get_middle_scores(user)]])
+    for i, user in enumerate(users)
+    if user['stars'] > 0 and (user['name'] in whitelist if whitelist is not None else True)
+  ]
+  print(tabulate(table, headers=["Place", "Name", "Stars", "Median Solve Time", "better", "current", "worse"]))
